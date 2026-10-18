@@ -1,0 +1,227 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Setup workspace folders",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/c",
+				"mkdir",
+				"algorithms",
+				"tests",
+				"docs"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Create project dirs",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\cmd.exe",
+			"args": [
+				"/c",
+				"mkdir",
+				"algorithms",
+				"tests",
+				"docs"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Setup venv",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\cmd.exe",
+			"args": [
+				"/c",
+				"C:\\Users\\vikra\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+				"-m",
+				"venv",
+				".venv"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Install dependencies",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\cmd.exe",
+			"args": [
+				"/c",
+				".venv\\Scripts\\python.exe",
+				"-m",
+				"pip",
+				"install",
+				"-r",
+				"requirements.txt"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Run pytest",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\cmd.exe",
+			"args": [
+				"/c",
+				".venv\\Scripts\\python.exe",
+				"-m",
+				"pytest",
+				"-q"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Verify pytest",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\cmd.exe",
+			"args": [
+				"/c",
+				".venv\\Scripts\\python.exe",
+				"-m",
+				"pytest",
+				"-q"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Inspect venv",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\cmd.exe",
+			"args": [
+				"/c",
+				"dir",
+				".venv\\Scripts",
+				"&&",
+				".venv\\Scripts\\python.exe",
+				"-m",
+				"pip",
+				"--version"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Check python via powershell",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"python --version"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Install Python dependencies",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"python -m pip install -r requirements.txt"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Run unit tests",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"python -m pytest -q"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Run tests fixed",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"python -m pytest -q"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Run Streamlit app",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"Set-Location 'E:\\DOWNLOADS\\OS graded'; .\\.venv\\Scripts\\python.exe -m streamlit run app.py --server.headless true --server.port 8501"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Run app in foreground",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"Set-Location 'E:\\DOWNLOADS\\OS graded'; .\\.venv\\Scripts\\python.exe -m streamlit run app.py --server.headless true --server.port 8501"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Start app on free port",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"Set-Location -Path 'E:\\DOWNLOADS\\OS graded'; .\\.venv\\Scripts\\python.exe -m streamlit run app.py --server.headless true --server.port 8502"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Final test verification",
+			"type": "shell",
+			"command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-Command",
+				"python -m pytest -q"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		}
+	]
+}
