@@ -1,4 +1,4 @@
-# Operating Systems Activity 2: Deadlock Analysis and Resource Allocation Dashboard
+# OS-Graded# Operating Systems Activity 2: Deadlock Analysis and Resource Allocation Dashboard
 
 **AI-Assisted Dashboard Development and Deadlock Analysis**  
 *An Academic Web Application & Viva Demonstration Platform for Operating Systems*
