@@ -44,161 +44,500 @@ from algorithms import (
 # ---------------------------------------------------------
 st.set_page_config(
     page_title="Deadlock Analysis & Resource Allocation Dashboard",
-    page_icon="🛡️",
+    page_icon=":material/shield:",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# Custom Dark Navy / Slate CSS with restrained cyan/blue accents
-CUSTOM_CSS = """
+
+def get_custom_css() -> str:
+    """Generate high-impact, bold editorial poster CSS with Cloud White & Ultramarine Blue palette."""
+    return """
 <style>
-    /* Dark Slate / Navy Palette */
+    @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
     :root {
-        --bg-main: #0b132b;
-        --bg-card: #1c2541;
-        --border-color: #3a506b;
-        --accent-cyan: #48cae4;
-        --accent-blue: #00b4d8;
-        --text-primary: #f8f9fa;
-        --text-secondary: #adb5bd;
+        /* Single Theme: Cloud White & Ultramarine Blue */
+        --bg-page: #F6F6F3;
+        --bg-surface: #FFFFFF;
+        --bg-surface-elevated: #FFFFFF;
+        --bg-subtle: #E8ECF8;
+        
+        --accent: #1A3A9E;
+        --accent-hover: #142E80;
+        --accent-subtle: #E8ECF8;
+        
+        --text-primary: #1A3A9E;
+        --text-body: #0F1B44;
+        --text-muted: #5B6794;
+        
+        --border: #D5DAEB;
+        --border-subtle: #E8ECF8;
+        --hairline: rgba(26, 58, 158, 0.18);
+        
+        /* Status Palette (Always paired with icon + label) */
+        --status-safe: #1E8E5A;
+        --status-safe-bg: rgba(30, 142, 90, 0.10);
+        --status-safe-border: rgba(30, 142, 90, 0.25);
+        
+        --status-unsafe: #C77D0A;
+        --status-unsafe-bg: rgba(199, 125, 10, 0.10);
+        --status-unsafe-border: rgba(199, 125, 10, 0.25);
+        
+        --status-deadlock: #C23B3B;
+        --status-deadlock-bg: rgba(194, 59, 59, 0.10);
+        --status-deadlock-border: rgba(194, 59, 59, 0.25);
+        
+        --status-waiting: #C77D0A;
+        --status-waiting-bg: rgba(199, 125, 10, 0.10);
+        --status-waiting-border: rgba(199, 125, 10, 0.25);
+        
+        --status-invalid: #5B6794;
+        --status-invalid-bg: rgba(91, 103, 148, 0.10);
+        --status-invalid-border: rgba(91, 103, 148, 0.25);
+        
+        /* Typography */
+        --font-display: 'Anton', 'Archivo Narrow', Impact, sans-serif;
+        --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+        
+        /* Typography Scale (Fluid clamp) */
+        --text-h1: clamp(2.25rem, 4.5vw, 4.5rem);
+        --text-h2: clamp(1.5rem, 2.5vw, 2.25rem);
+        --text-h3: clamp(1.15rem, 1.8vw, 1.5rem);
+        --text-metric: clamp(2.5rem, 4vw, 4rem);
+        --text-body-size: 1.0625rem;
+        --text-table-size: 0.9375rem;
+        --text-label-size: 0.75rem;
+        
+        /* Spacing Scale (8px) */
+        --space-1: 4px;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+        --space-5: 20px;
+        --space-6: 24px;
+        --space-8: 32px;
+        --space-12: 48px;
+        
+        --radius-sm: 6px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-pill: 9999px;
     }
     
     .stApp {
-        background-color: #0d1b2a;
-        color: #e0e1dd;
+        background-color: var(--bg-page);
+        color: var(--text-body);
+        font-family: var(--font-body);
+        font-size: var(--text-body-size);
+        line-height: 1.6;
     }
     
-    /* Header styling */
-    .dashboard-header {
-        background: linear-gradient(135deg, #1b263b 0%, #0d1b2a 100%);
-        padding: 1.5rem 2rem;
-        border-radius: 10px;
-        border: 1px solid #415a77;
-        margin-bottom: 1.5rem;
+    /* Typography Rules */
+    h1, h2, h3 {
+        font-family: var(--font-display) !important;
+        text-transform: uppercase !important;
+        letter-spacing: -0.015em !important;
+        line-height: 0.95 !important;
+        color: var(--text-primary) !important;
     }
     
-    .dashboard-header h1 {
-        color: #e0e1dd;
-        font-size: 1.9rem;
+    h1 { font-size: var(--text-h1) !important; margin: 0 0 var(--space-3) 0 !important; }
+    h2 { font-size: var(--text-h2) !important; margin-top: var(--space-6) !important; margin-bottom: var(--space-3) !important; }
+    h3 { font-size: var(--text-h3) !important; margin-top: var(--space-4) !important; margin-bottom: var(--space-2) !important; }
+    h4, h5, h6 {
+        font-family: var(--font-body) !important;
+        font-weight: 700 !important;
+        color: var(--text-primary) !important;
+        letter-spacing: 0.02em !important;
+    }
+    
+    code, pre, .stDataFrame, [data-testid="stTable"] {
+        font-family: var(--font-mono) !important;
+    }
+    
+    /* Editorial Top Page Header */
+    .editorial-header {
+        margin-bottom: var(--space-4);
+        padding-top: var(--space-1);
+    }
+    
+    .editorial-eyebrow {
+        font-family: var(--font-body);
+        font-size: var(--text-label-size);
         font-weight: 700;
-        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--text-muted);
+        margin-bottom: var(--space-2);
+        display: block;
     }
     
-    .dashboard-header p {
-        color: #778da9;
-        font-size: 0.95rem;
-        margin-top: 0.4rem;
-        margin-bottom: 0;
+    .editorial-title {
+        font-family: var(--font-display) !important;
+        font-size: var(--text-h1) !important;
+        text-transform: uppercase !important;
+        line-height: 0.95 !important;
+        letter-spacing: -0.015em !important;
+        color: var(--text-primary) !important;
+        margin: 0 0 var(--space-2) 0 !important;
+    }
+    
+    .editorial-desc {
+        font-family: var(--font-body);
+        font-size: 1.05rem;
+        color: var(--text-muted);
+        margin: 0 0 var(--space-4) 0;
+        line-height: 1.5;
+    }
+    
+    .editorial-rule {
+        height: 1px;
+        background-color: var(--border);
+        border: none;
+        margin-bottom: var(--space-6);
     }
     
     /* Metric Cards */
     .metric-card {
-        background: #1b263b;
-        border: 1px solid #415a77;
-        border-radius: 8px;
-        padding: 1rem 1.25rem;
-        text-align: center;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-5) var(--space-4);
+        text-align: left;
+        transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+    
+    .metric-card:hover {
+        border-color: var(--accent);
     }
     
     .metric-title {
-        font-size: 0.82rem;
+        font-family: var(--font-body);
+        font-size: var(--text-label-size);
+        font-weight: 700;
         text-transform: uppercase;
-        color: #778da9;
-        letter-spacing: 0.05em;
-        margin-bottom: 0.3rem;
+        color: var(--text-muted);
+        letter-spacing: 0.18em;
+        margin-bottom: var(--space-1);
     }
     
     .metric-value {
-        font-size: 1.7rem;
-        font-weight: 700;
-        color: #e0e1dd;
+        font-family: var(--font-display);
+        font-size: var(--text-metric);
+        font-weight: 400;
+        line-height: 1.0;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+        margin-bottom: var(--space-1);
     }
     
     .metric-subtitle {
-        font-size: 0.78rem;
-        color: #48cae4;
-        margin-top: 0.2rem;
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        color: var(--text-muted);
     }
     
     /* Status Badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: var(--radius-pill);
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 0.8125rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        line-height: 1;
+    }
+    
+    .status-badge svg {
+        width: 15px;
+        height: 15px;
+        flex-shrink: 0;
+    }
+    
     .badge-safe {
-        display: inline-block;
-        padding: 0.35rem 0.85rem;
-        border-radius: 20px;
-        background-color: rgba(46, 204, 113, 0.2);
-        color: #2ecc71;
-        border: 1px solid #2ecc71;
-        font-weight: 700;
-        font-size: 0.85rem;
+        background-color: var(--status-safe-bg);
+        color: var(--status-safe);
+        border: 1px solid var(--status-safe-border);
     }
     
-    .badge-unsafe {
-        display: inline-block;
-        padding: 0.35rem 0.85rem;
-        border-radius: 20px;
-        background-color: rgba(243, 156, 18, 0.2);
-        color: #f39c12;
-        border: 1px solid #f39c12;
-        font-weight: 700;
-        font-size: 0.85rem;
+    .badge-unsafe, .badge-waiting {
+        background-color: var(--status-unsafe-bg);
+        color: var(--status-unsafe);
+        border: 1px solid var(--status-unsafe-border);
     }
     
-    .badge-deadlock {
-        display: inline-block;
-        padding: 0.35rem 0.85rem;
-        border-radius: 20px;
-        background-color: rgba(231, 76, 60, 0.2);
-        color: #e74c3c;
-        border: 1px solid #e74c3c;
-        font-weight: 700;
-        font-size: 0.85rem;
-    }
-    
-    .badge-waiting {
-        display: inline-block;
-        padding: 0.35rem 0.85rem;
-        border-radius: 20px;
-        background-color: rgba(52, 152, 219, 0.2);
-        color: #3498db;
-        border: 1px solid #3498db;
-        font-weight: 700;
-        font-size: 0.85rem;
-    }
-    
-    .badge-denied {
-        display: inline-block;
-        padding: 0.35rem 0.85rem;
-        border-radius: 20px;
-        background-color: rgba(230, 126, 34, 0.2);
-        color: #e67e22;
-        border: 1px solid #e67e22;
-        font-weight: 700;
-        font-size: 0.85rem;
+    .badge-deadlock, .badge-denied {
+        background-color: var(--status-deadlock-bg);
+        color: var(--status-deadlock);
+        border: 1px solid var(--status-deadlock-border);
     }
     
     .badge-invalid {
-        display: inline-block;
-        padding: 0.35rem 0.85rem;
-        border-radius: 20px;
-        background-color: rgba(149, 165, 166, 0.2);
-        color: #bdc3c7;
-        border: 1px solid #bdc3c7;
-        font-weight: 700;
-        font-size: 0.85rem;
+        background-color: var(--status-invalid-bg);
+        color: var(--status-invalid);
+        border: 1px solid var(--status-invalid-border);
     }
     
     /* Concept boxes */
     .concept-box {
-        background-color: #1b263b;
-        border-left: 4px solid #00b4d8;
-        padding: 0.9rem 1.2rem;
-        border-radius: 0 6px 6px 0;
-        margin: 1rem 0;
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--accent);
+        padding: var(--space-4) var(--space-6);
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        margin: var(--space-4) 0;
+        color: var(--text-body);
+        font-size: 0.9375rem;
+        line-height: 1.6;
+    }
+    
+    /* Primary & Secondary Buttons */
+    .stButton > button[kind="primary"], .stButton > button[data-testid="stBaseButton-primary"] {
+        background-color: var(--accent) !important;
+        color: #FFFFFF !important;
+        border: 1px solid var(--accent) !important;
+        border-radius: var(--radius-md) !important;
+        font-family: var(--font-body) !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        font-size: 0.8125rem !important;
+        letter-spacing: 0.08em !important;
+        padding: 0.5rem 1.25rem !important;
+        transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.05s ease !important;
+    }
+    
+    .stButton > button[kind="primary"]:hover, .stButton > button[data-testid="stBaseButton-primary"]:hover {
+        background-color: var(--accent-hover) !important;
+        border-color: var(--accent-hover) !important;
+    }
+    
+    .stButton > button[kind="primary"]:active, .stButton > button[data-testid="stBaseButton-primary"]:active {
+        background-color: var(--accent-hover) !important;
+        transform: translateY(1px);
+    }
+    
+    .stButton > button[kind="secondary"], .stButton > button[data-testid="stBaseButton-secondary"] {
+        background-color: var(--bg-surface) !important;
+        color: var(--accent) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: var(--radius-md) !important;
+        font-family: var(--font-body) !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        font-size: 0.8125rem !important;
+        letter-spacing: 0.06em !important;
+        padding: 0.5rem 1.25rem !important;
+    }
+    
+    .stButton > button[kind="secondary"]:hover, .stButton > button[data-testid="stBaseButton-secondary"]:hover {
+        border-color: var(--accent) !important;
+        background-color: var(--accent-subtle) !important;
+        color: var(--accent) !important;
+    }
+    
+    /* Sidebar Layout & Brand */
+    [data-testid="stSidebar"] {
+        background-color: #FFFFFF !important;
+        border-right: 1px solid var(--border) !important;
+    }
+    
+    [data-testid="stSidebarContent"] {
+        padding: 1.5rem 1rem !important;
+    }
+    
+    .sidebar-header-box {
+        padding: 0.25rem 0.5rem 0 0.5rem;
+    }
+    
+    .sidebar-app-title {
+        font-family: var(--font-display) !important;
+        font-size: 1.85rem !important;
+        letter-spacing: -0.015em !important;
+        color: var(--text-primary) !important;
+        text-transform: uppercase !important;
+        line-height: 0.95 !important;
+        margin: 0 0 6px 0 !important;
+    }
+    
+    .sidebar-subtitle {
+        font-family: var(--font-body) !important;
+        font-size: 0.6875rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.18em !important;
+        color: var(--text-muted) !important;
+        line-height: 1.2 !important;
+        display: block;
+    }
+    
+    .sidebar-rule {
+        height: 1px;
+        background-color: var(--border);
+        border: none;
+        margin: 0.85rem 0 0.5rem 0;
+    }
+    
+    .sidebar-footer-box {
+        margin-top: 2rem;
+        padding: 1rem 0.5rem 0.5rem 0.5rem;
+        border-top: 1px solid var(--border);
+        font-family: var(--font-body);
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+    }
+    
+    /* Sidebar Navigation Section Headings */
+    .nav-section-title {
+        font-family: var(--font-body) !important;
+        font-size: var(--text-label-size) !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.18em !important;
+        color: var(--text-muted) !important;
+        padding: 0.85rem 0.5rem 0.25rem 0.5rem !important;
+    }
+    
+    .nav-section-title:first-of-type {
+        padding-top: 0.25rem !important;
+    }
+    
+    /* Page Link Items in Sidebar */
+    [data-testid="stPageLink-NavLink"] a,
+    [data-testid="stPageLink"] a {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        border-radius: var(--radius-md) !important;
+        padding: 0.45rem 0.75rem !important;
+        margin: 2px 0 !important;
+        color: var(--text-body) !important;
+        font-family: var(--font-body) !important;
+        font-size: 0.875rem !important;
+        font-weight: 500 !important;
+        text-decoration: none !important;
+        background-color: transparent !important;
+        border: 1px solid transparent !important;
+        transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
+    }
+    
+    [data-testid="stPageLink-NavLink"] a:hover,
+    [data-testid="stPageLink"] a:hover {
+        background-color: var(--bg-subtle) !important;
+        color: var(--accent) !important;
+        border-color: var(--border) !important;
+    }
+    
+    /* Active Link in Sidebar */
+    [data-testid="stPageLink-NavLink"] a[aria-current="page"],
+    [data-testid="stPageLink"] a[aria-current="page"] {
+        background-color: var(--accent) !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        border-color: var(--accent) !important;
+    }
+    
+    [data-testid="stPageLink-NavLink"] a[aria-current="page"] p,
+    [data-testid="stPageLink-NavLink"] a[aria-current="page"] span,
+    [data-testid="stPageLink-NavLink"] a[aria-current="page"] svg,
+    [data-testid="stPageLink"] a[aria-current="page"] p,
+    [data-testid="stPageLink"] a[aria-current="page"] span,
+    [data-testid="stPageLink"] a[aria-current="page"] svg {
+        color: #FFFFFF !important;
+        fill: #FFFFFF !important;
+    }
+    
+    [data-testid="stPageLink-NavLink"] a:focus-visible,
+    [data-testid="stPageLink"] a:focus-visible {
+        outline: 2px solid var(--accent) !important;
+        outline-offset: 2px !important;
+    }
+    
+    /* Native components restyling */
+    [data-testid="stDataFrame"], [data-testid="stTable"] {
+        border: 1px solid var(--border) !important;
+        border-radius: var(--radius-md) !important;
+        background-color: var(--bg-surface) !important;
+        font-family: var(--font-mono) !important;
+        font-size: var(--text-table-size) !important;
+    }
+    
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px !important;
+        border-bottom: 1px solid var(--border) !important;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        font-family: var(--font-body) !important;
+        font-weight: 600 !important;
+        font-size: 0.8125rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.06em !important;
+        color: var(--text-muted) !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important;
+    }
+    
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        color: var(--accent) !important;
+        border-bottom: 2px solid var(--accent) !important;
+    }
+    
+    /* Alerts & Callouts */
+    [data-testid="stAlert"] {
+        border-radius: var(--radius-md) !important;
+        font-family: var(--font-body) !important;
+        font-size: 0.9375rem !important;
+    }
+    
+    hr {
+        border-color: var(--border) !important;
     }
 </style>
 """
-st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+
+
+def get_themed_plotly_layout() -> dict:
+    """Generate consistent Plotly chart styling adhering to the Cloud White & Ultramarine Blue palette."""
+    bg_surface = "#FFFFFF"
+    text_primary = "#1A3A9E"
+    text_secondary = "#0F1B44"
+    grid_color = "#D5DAEB"
+
+    return dict(
+        paper_bgcolor=bg_surface,
+        plot_bgcolor=bg_surface,
+        font=dict(family="Inter, sans-serif", color=text_secondary, size=12),
+        title_font=dict(family="Anton, Impact, sans-serif", color=text_primary, size=18),
+        colorway=["#1A3A9E", "#2D50B8", "#1E8E5A", "#C77D0A", "#C23B3B", "#5B6794"],
+        xaxis=dict(
+            gridcolor=grid_color,
+            zerolinecolor=grid_color,
+            tickfont=dict(family="JetBrains Mono, monospace", color=text_secondary, size=11),
+        ),
+        yaxis=dict(
+            gridcolor=grid_color,
+            zerolinecolor=grid_color,
+            tickfont=dict(family="JetBrains Mono, monospace", color=text_secondary, size=11),
+        ),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+            font=dict(family="Inter, sans-serif", color=text_secondary, size=11),
+        ),
+        margin=dict(l=24, r=24, t=44, b=24),
+    )
+
 
 # ---------------------------------------------------------
 # Default Configurations & Session State
@@ -271,58 +610,44 @@ def get_active_matrices():
     return num_p, num_r, r_names, total, alloc, maximum, available, need
 
 
+def render_page_header(eyebrow: str, title: str, description: str):
+    """Render a consistent, bold editorial page header across all dashboard views."""
+    st.markdown(
+        f"""
+        <div class="editorial-header">
+            <span class="editorial-eyebrow">{eyebrow}</span>
+            <h1 class="editorial-title">{title}</h1>
+            <p class="editorial-desc">{description}</p>
+            <div class="editorial-rule"></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def render_status_badge(status: str):
+    """Render an accessible status badge with inline SVG and ultramarine/status palette styling."""
+    svg_check = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+    svg_warn = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+    svg_deadlock = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>'
+    svg_wait = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>'
+    svg_denied = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+    svg_invalid = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+
     badges = {
-        "SAFE": '<span class="badge-safe">🛡️ SAFE</span>',
-        "UNSAFE": '<span class="badge-unsafe">⚠️ UNSAFE</span>',
-        "DEADLOCK DETECTED": '<span class="badge-deadlock">⛔ DEADLOCK DETECTED</span>',
-        "REQUEST WAITING / NOT CURRENTLY AVAILABLE": '<span class="badge-waiting">⏳ REQUEST WAITING (UNAVAILABLE)</span>',
-        "REQUEST WAITING": '<span class="badge-waiting">⏳ REQUEST WAITING (UNAVAILABLE)</span>',
-        "REQUEST GRANTED": '<span class="badge-safe">✅ REQUEST GRANTED</span>',
-        "REQUEST DENIED": '<span class="badge-denied">❌ REQUEST DENIED (UNSAFE)</span>',
-        "INVALID INPUT": '<span class="badge-invalid">🚫 INVALID INPUT</span>',
+        "SAFE": f'<span class="status-badge badge-safe">{svg_check} SAFE</span>',
+        "UNSAFE": f'<span class="status-badge badge-unsafe">{svg_warn} UNSAFE</span>',
+        "DEADLOCK DETECTED": f'<span class="status-badge badge-deadlock">{svg_deadlock} DEADLOCK DETECTED</span>',
+        "REQUEST WAITING / NOT CURRENTLY AVAILABLE": f'<span class="status-badge badge-waiting">{svg_wait} REQUEST WAITING (UNAVAILABLE)</span>',
+        "REQUEST WAITING": f'<span class="status-badge badge-waiting">{svg_wait} REQUEST WAITING (UNAVAILABLE)</span>',
+        "REQUEST GRANTED": f'<span class="status-badge badge-safe">{svg_check} REQUEST GRANTED</span>',
+        "REQUEST DENIED": f'<span class="status-badge badge-denied">{svg_denied} REQUEST DENIED (UNSAFE)</span>',
+        "INVALID INPUT": f'<span class="status-badge badge-invalid">{svg_invalid} INVALID INPUT</span>',
     }
-    badge_html = badges.get(status, f'<span class="badge-invalid">{status}</span>')
+    badge_html = badges.get(status, f'<span class="status-badge badge-invalid">{svg_invalid} {status}</span>')
     st.markdown(badge_html, unsafe_allow_html=True)
 
 
-# ---------------------------------------------------------
-# Sidebar Navigation
-# ---------------------------------------------------------
-def render_sidebar():
-    st.sidebar.markdown(
-        """
-        <div style="text-align: center; padding: 0.5rem 0 1rem 0;">
-            <h2 style="color: #48cae4; margin:0;">OS Dashboard</h2>
-            <span style="font-size: 0.8rem; color: #778da9;">Activity 2 • Deadlock Analysis</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    st.sidebar.markdown("---")
-    menu = [
-        "1. Overview Dashboard",
-        "2. Resource Configuration",
-        "3. Banker's Algorithm",
-        "4. Resource Request Simulator",
-        "5. Deadlock Detection",
-        "6. Deadlock Prevention and Recovery",
-        "7. Test Cases and Analysis",
-        "8. AI Usage Record and Documentation",
-    ]
-    selection = st.sidebar.radio("Navigation", menu, index=0)
-    st.sidebar.markdown("---")
-    st.sidebar.markdown(
-        """
-        <div style="font-size: 0.75rem; color: #778da9; line-height: 1.4;">
-            <b>System Model:</b> Banker's Algorithm & Multiple-Instance RAG.<br>
-            <b>Framework:</b> Python 3.13 / Streamlit.<br>
-            <b>Status:</b> All algorithms active & verified.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    return selection
 
 
 # ---------------------------------------------------------
@@ -332,14 +657,10 @@ def page_overview():
     num_p, num_r, r_names, total, alloc, maximum, available, need = get_active_matrices()
     safe_result = find_safe_sequence(total, alloc, maximum)
 
-    st.markdown(
-        """
-        <div class="dashboard-header">
-            <h1>Operating Systems Activity 2 — Overview Dashboard</h1>
-            <p>Real-time system state, resource utilization, and Banker's algorithm safe-state analysis.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    render_page_header(
+        eyebrow="SETUP",
+        title="OVERVIEW DASHBOARD.",
+        description="Real-time system state, resource utilization, and Banker's algorithm safe-state analysis.",
     )
 
     # Top Metric Cards
@@ -354,13 +675,12 @@ def page_overview():
         st.markdown(f'<div class="metric-card"><div class="metric-title">Available</div><div class="metric-value">{sum(available)}</div><div class="metric-subtitle">{available}</div></div>', unsafe_allow_html=True)
     with c5:
         status_text = "SAFE" if safe_result["safe"] else "UNSAFE"
-        status_color = "#2ecc71" if safe_result["safe"] else "#f39c12"
+        status_color = "var(--status-safe)" if safe_result["safe"] else "var(--status-unsafe)"
         st.markdown(f'<div class="metric-card"><div class="metric-title">Safety State</div><div class="metric-value" style="color: {status_color};">{status_text}</div><div class="metric-subtitle">Banker\'s Check</div></div>', unsafe_allow_html=True)
     with c6:
-        # Dynamic analytical test verification
         analytical_cases = run_analytical_test_cases()
         passed_count = sum(1 for tc in analytical_cases if tc["Pass/Fail"] == "PASS")
-        st.markdown(f'<div class="metric-card"><div class="metric-title">Test Suite</div><div class="metric-value" style="color: #48cae4;">{passed_count}/{len(analytical_cases)}</div><div class="metric-subtitle">100% Verified</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-card"><div class="metric-title">Test Suite</div><div class="metric-value" style="color: var(--accent);">{passed_count}/{len(analytical_cases)}</div><div class="metric-subtitle">100% Verified</div></div>', unsafe_allow_html=True)
 
     st.write("")
 
@@ -372,7 +692,7 @@ def page_overview():
             render_status_badge("SAFE")
             st.markdown(
                 """
-                <div class="concept-box" style="border-left-color: #2ecc71;">
+                <div class="concept-box" style="border-left-color: var(--status-safe);">
                     <b>State Explanation:</b> The system is in a <b>SAFE</b> state. There exists at least one dispatching sequence
                     such that every process can satisfy its declared maximum demand and run to completion without deadlocking.
                 </div>
@@ -383,7 +703,7 @@ def page_overview():
             render_status_badge("UNSAFE")
             st.markdown(
                 """
-                <div class="concept-box" style="border-left-color: #f39c12;">
+                <div class="concept-box" style="border-left-color: var(--status-unsafe);">
                     <b>State Explanation:</b> The system is in an <b>UNSAFE</b> state. No safe sequence could be found that guarantees
                     all processes can finish under worst-case maximum claims. <i>Note: An unsafe state is not automatically a deadlock;
                     it represents a state vulnerable to future deadlock.</i>
@@ -395,13 +715,13 @@ def page_overview():
     with col_seq:
         st.markdown("#### Safe Execution Sequence")
         if safe_result["safe"]:
-            seq_formatted = " ➔ ".join([f"**P{p}**" for p in safe_result["safe_sequence"]])
-            st.success(f"Safe sequence found: {seq_formatted}")
+            seq_formatted = " → ".join([f"**P{p}**" for p in safe_result["safe_sequence"]])
+            st.success(f"Safe sequence found: {seq_formatted}", icon=":material/check_circle:")
             st.caption("Processes can be dispatched in this exact order to guarantee zero deadlocks under maximum resource demands.")
         else:
-            st.error("No complete safe sequence exists under the active resource configuration.")
+            st.error("No complete safe sequence exists under the active resource configuration.", icon=":material/warning:")
             unfinished_str = ", ".join([f"P{p}" for p in safe_result.get("unfinished_processes", [])])
-            st.warning(f"Unfinished blocked processes: {unfinished_str}")
+            st.warning(f"Unfinished blocked processes: {unfinished_str}", icon=":material/warning:")
 
     st.write("---")
 
@@ -410,7 +730,6 @@ def page_overview():
     col_chart1, col_chart2 = st.columns(2)
 
     with col_chart1:
-        # Utilization grouped bar chart
         allocated_sums = [sum(alloc[i][j] for i in range(num_p)) for j in range(num_r)]
         chart_df = pd.DataFrame({
             "Resource": r_names,
@@ -418,25 +737,20 @@ def page_overview():
             "Allocated": allocated_sums,
             "Available": available,
         })
+        alloc_color = "#1A3A9E"
+        avail_color = "#1E8E5A"
         fig = px.bar(
             chart_df,
             x="Resource",
             y=["Allocated", "Available"],
             title="System Resource Distribution (Allocated vs Available)",
             barmode="stack",
-            color_discrete_map={"Allocated": "#00b4d8", "Available": "#2ecc71"},
+            color_discrete_map={"Allocated": alloc_color, "Available": avail_color},
         )
-        fig.update_layout(
-            paper_bgcolor="#1b263b",
-            plot_bgcolor="#1b263b",
-            font_color="#e0e1dd",
-            margin=dict(l=20, r=20, t=40, b=20),
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        )
+        fig.update_layout(**get_themed_plotly_layout())
         st.plotly_chart(fig, use_container_width=True)
 
     with col_chart2:
-        # Process breakdown chart
         alloc_records = []
         for i in range(num_p):
             for j in range(num_r):
@@ -446,6 +760,7 @@ def page_overview():
                     "Allocated Units": alloc[i][j],
                 })
         alloc_breakdown_df = pd.DataFrame(alloc_records)
+        seq_colors = ["#1A3A9E", "#2B4CB8", "#4169E1", "#5C7AEA", "#7B96F2"]
         fig_breakdown = px.bar(
             alloc_breakdown_df,
             x="Process",
@@ -453,15 +768,9 @@ def page_overview():
             color="Resource",
             title="Per-Process Resource Allocation Holding",
             barmode="group",
-            color_discrete_sequence=["#48cae4", "#0077b6", "#90e0ef", "#5bc0be"],
+            color_discrete_sequence=seq_colors,
         )
-        fig_breakdown.update_layout(
-            paper_bgcolor="#1b263b",
-            plot_bgcolor="#1b263b",
-            font_color="#e0e1dd",
-            margin=dict(l=20, r=20, t=40, b=20),
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        )
+        fig_breakdown.update_layout(**get_themed_plotly_layout())
         st.plotly_chart(fig_breakdown, use_container_width=True)
 
     st.write("---")
@@ -479,14 +788,10 @@ def page_overview():
 # 2. Resource Configuration
 # ---------------------------------------------------------
 def page_configuration():
-    st.markdown(
-        """
-        <div class="dashboard-header">
-            <h1>Resource Configuration & Matrix Editor</h1>
-            <p>Customize processes, resource types, capacities, allocations, and maximum demands with instant mathematical validation.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    render_page_header(
+        eyebrow="SETUP",
+        title="RESOURCE CONFIGURATION.",
+        description="Customize processes, resource capacities, allocations, and maximum demands with instant mathematical validation.",
     )
 
     cfg = st.session_state.config
@@ -495,12 +800,12 @@ def page_configuration():
     st.markdown("##### Quick Presets & Academic Scenarios")
     p_col1, p_col2, p_col3, p_col4 = st.columns(4)
     with p_col1:
-        if st.button("Load Standard Safe Example (5P x 3R)", use_container_width=True):
+        if st.button("Load Standard Safe Example (5P x 3R)", use_container_width=True, icon=":material/check_circle:"):
             st.session_state.config = get_default_config()
-            st.success("Loaded standard safe Banker's textbook scenario.")
+            st.success("Loaded standard safe Banker's textbook scenario.", icon=":material/check_circle:")
             st.rerun()
     with p_col2:
-        if st.button("Load Unsafe Configuration", use_container_width=True):
+        if st.button("Load Unsafe Configuration", use_container_width=True, icon=":material/warning:"):
             st.session_state.config = {
                 "process_count": 3,
                 "resource_count": 3,
@@ -509,24 +814,24 @@ def page_configuration():
                 "allocation": [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
                 "maximum": [[3, 3, 2], [3, 3, 2], [3, 3, 2]],
             }
-            st.warning("Loaded structurally valid but UNSAFE configuration.")
+            st.warning("Loaded structurally valid but UNSAFE configuration.", icon=":material/warning:")
             st.rerun()
     with p_col3:
-        if st.button("Load Zero-Available Edge Case", use_container_width=True):
+        if st.button("Load Zero-Available Edge Case", use_container_width=True, icon=":material/info:"):
             st.session_state.config = {
                 "process_count": 2,
                 "resource_count": 2,
                 "resource_names": ["R0", "R1"],
                 "total_instances": [5, 5],
                 "allocation": [[3, 3], [2, 2]],
-                "maximum": [[3, 3], [5, 5]],  # P0 has need [0, 0]
+                "maximum": [[3, 3], [5, 5]],
             }
-            st.info("Loaded valid edge case with Available=[0, 0] and P0 Need=[0, 0].")
+            st.info("Loaded valid edge case with Available=[0, 0] and P0 Need=[0, 0].", icon=":material/info:")
             st.rerun()
     with p_col4:
-        if st.button("Reset to Default", use_container_width=True):
+        if st.button("Reset to Default", use_container_width=True, icon=":material/settings_backup_restore:"):
             st.session_state.config = get_default_config()
-            st.info("Reset configuration to initial state.")
+            st.info("Reset configuration to initial state.", icon=":material/info:")
             st.rerun()
 
     st.write("---")
@@ -576,7 +881,6 @@ def page_configuration():
 
     st.write("---")
 
-    # Live Validation & Apply Button
     cand_total = [int(v) for v in edited_totals.values[0]]
     cand_alloc = [[int(v) for v in row] for row in edited_alloc.values]
     cand_max = [[int(v) for v in row] for row in edited_max.values]
@@ -585,7 +889,7 @@ def page_configuration():
 
     col_btn, col_val = st.columns([1, 2])
     with col_btn:
-        if st.button("Apply & Commit Configuration", type="primary", use_container_width=True):
+        if st.button("Apply & Commit Configuration", type="primary", use_container_width=True, icon=":material/check:"):
             if val_res["valid"]:
                 st.session_state.config = {
                     "process_count": p_count,
@@ -595,18 +899,18 @@ def page_configuration():
                     "allocation": cand_alloc,
                     "maximum": cand_max,
                 }
-                st.success("Configuration successfully validated and applied!")
+                st.success("Configuration successfully validated and applied!", icon=":material/check_circle:")
                 st.rerun()
             else:
-                st.error("Cannot apply invalid configuration. Please resolve the errors shown on the right.")
+                st.error("Cannot apply invalid configuration. Please resolve the errors shown on the right.", icon=":material/cancel:")
 
     with col_val:
         if val_res["valid"]:
-            st.success("Configuration is mathematically valid! (All constraints satisfied)")
+            st.success("Configuration is mathematically valid! (All constraints satisfied)", icon=":material/check_circle:")
             computed_avail = calculate_available(cand_total, cand_alloc)
-            st.info(f"Calculated Available Vector: {dict(zip(r_names, computed_avail))}")
+            st.info(f"Calculated Available Vector: {dict(zip(r_names, computed_avail))}", icon=":material/info:")
         else:
-            st.error("Configuration Validation Errors Detected:")
+            st.error("Configuration Validation Errors Detected:", icon=":material/cancel:")
             for err in val_res["errors"]:
                 st.write(f"• {err}")
 
@@ -618,17 +922,12 @@ def page_bankers():
     num_p, num_r, r_names, total, alloc, maximum, available, need = get_active_matrices()
     safety = find_safe_sequence(total, alloc, maximum)
 
-    st.markdown(
-        """
-        <div class="dashboard-header">
-            <h1>Banker's Algorithm & Safe-State Analysis</h1>
-            <p>Step-by-step trace of the safety algorithm, Work vector tracking, and safe-sequence determination.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    render_page_header(
+        eyebrow="ALGORITHMS",
+        title="BANKER'S ALGORITHM.",
+        description="Step-by-step trace of the safety algorithm, Work vector tracking, and safe-sequence determination.",
     )
 
-    # Matrix displays
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("Allocation Matrix")
@@ -644,22 +943,21 @@ def page_bankers():
 
     st.write("---")
 
-    # Execution controls
     c_btn, c_chk = st.columns([1, 2])
     with c_btn:
-        run_btn = st.button("Run Banker's Safety Analysis", type="primary", use_container_width=True)
+        run_btn = st.button("Run Banker's Safety Analysis", type="primary", use_container_width=True, icon=":material/calculate:")
     with c_chk:
         step_mode = st.checkbox("Enable Step-by-Step Interactive Stepper", value=True)
 
-    if run_btn or True:  # Run by default to display results
+    if run_btn or True:
         st.write("### Safety Check Result")
         if safety["safe"]:
             render_status_badge("SAFE")
-            seq_str = " ➔ ".join([f"**P{p}**" for p in safety["safe_sequence"]])
-            st.success(f"**Safe Sequence Found:** {seq_str}")
+            seq_str = " → ".join([f"**P{p}**" for p in safety["safe_sequence"]])
+            st.success(f"**Safe Sequence Found:** {seq_str}", icon=":material/check_circle:")
             st.markdown(
                 f"""
-                <div class="concept-box" style="border-left-color: #2ecc71;">
+                <div class="concept-box" style="border-left-color: var(--status-safe);">
                     <b>Algorithm Conclusion:</b> All {num_p} processes can execute to completion in the sequence {safety['safe_sequence']}.
                     At each iteration, the selected process's remaining Need was component-wise less than or equal to the Work vector,
                     allowing it to finish and release its allocated resources.
@@ -669,10 +967,10 @@ def page_bankers():
             )
         else:
             render_status_badge("UNSAFE")
-            st.error(f"**UNSAFE State:** {safety['reason']}")
+            st.error(f"**UNSAFE State:** {safety['reason']}", icon=":material/warning:")
             st.markdown(
                 """
-                <div class="concept-box" style="border-left-color: #f39c12;">
+                <div class="concept-box" style="border-left-color: var(--status-unsafe);">
                     <b>Algorithm Conclusion:</b> No complete safe sequence exists. The system cannot guarantee that all processes
                     can complete under maximum declared demands without deadlock risk.
                 </div>
@@ -680,7 +978,6 @@ def page_bankers():
                 unsafe_allow_html=True,
             )
 
-        # Step by step trace
         if step_mode and safety["steps"]:
             st.write("---")
             st.subheader("Step-by-Step Execution Trace")
@@ -693,14 +990,13 @@ def page_bankers():
                 st.markdown(f"**Process Need:** `{dict(zip(r_names, step_data['need']))}`")
             with s_col2:
                 st.markdown(f"**Work Before:** `{dict(zip(r_names, step_data['work_before']))}`")
-                st.markdown(f"**Condition:** `Need <= Work` ✅ **True**")
+                st.markdown(f"**Condition:** `Need <= Work` (Satisfied)")
             with s_col3:
                 st.markdown(f"**Released:** `{dict(zip(r_names, step_data['released']))}`")
                 st.markdown(f"**Work After:** `{dict(zip(r_names, step_data['work_after']))}`")
 
-            st.info(f"**Trace Log:** {step_data['explanation']}")
+            st.info(f"**Trace Log:** {step_data['explanation']}", icon=":material/info:")
 
-            # Full Trace Table
             st.write("#### Full Execution Trace Summary")
             trace_table = [
                 {
@@ -723,17 +1019,12 @@ def page_bankers():
 def page_request_simulator():
     num_p, num_r, r_names, total, alloc, maximum, available, need = get_active_matrices()
 
-    st.markdown(
-        """
-        <div class="dashboard-header">
-            <h1>Banker's Resource Request Simulator</h1>
-            <p>Simulate dynamic resource requests with formal 7-step Banker's algorithm validation and rollback safety guarantees.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    render_page_header(
+        eyebrow="ALGORITHMS",
+        title="REQUEST SIMULATOR.",
+        description="Simulate dynamic resource requests with formal 7-step Banker's algorithm validation and rollback safety guarantees.",
     )
 
-    # Academic Scenario Quick Loaders
     st.markdown("##### Quick Load Required Academic Scenarios")
     sc1, sc2, sc3, sc4 = st.columns(4)
 
@@ -749,35 +1040,32 @@ def page_request_simulator():
         req_vals = st.session_state.req_vals_override
 
     with sc1:
-        if st.button("Scenario A: Safe & Granted Request", use_container_width=True):
-            # Process 4 requests [1, 0, 0] in default
+        if st.button("Scenario A: Safe & Granted Request", use_container_width=True, icon=":material/check_circle:"):
             st.session_state.req_p_override = 4 if num_p > 4 else 0
             st.session_state.req_vals_override = [1 if j == 0 else 0 for j in range(num_r)]
             st.rerun()
 
     with sc2:
-        if st.button("Scenario B: Exceeds Available (Waiting)", use_container_width=True):
+        if st.button("Scenario B: Exceeds Available (Waiting)", use_container_width=True, icon=":material/hourglass_empty:"):
             st.session_state.req_p_override = waiting_ex["process_id"]
             st.session_state.req_vals_override = waiting_ex["request"]
             st.rerun()
 
     with sc3:
-        if st.button("Scenario C: Produces Unsafe State (Denied)", use_container_width=True):
+        if st.button("Scenario C: Produces Unsafe State (Denied)", use_container_width=True, icon=":material/block:"):
             st.session_state.req_p_override = unsafe_ex["process_id"]
             st.session_state.req_vals_override = unsafe_ex["request"]
             st.rerun()
 
     with sc4:
-        if st.button("Scenario: Exceeds Need (Invalid)", use_container_width=True):
+        if st.button("Scenario: Exceeds Need (Invalid)", use_container_width=True, icon=":material/cancel:"):
             st.session_state.req_p_override = 0
-            # Exceed need on resource 0
             excessive = [need[0][j] + (5 if j == 0 else 0) for j in range(num_r)]
             st.session_state.req_vals_override = excessive
             st.rerun()
 
     st.write("---")
 
-    # Request Inputs
     col_p, col_vec = st.columns([1, 2])
     with col_p:
         sel_p = st.selectbox(
@@ -796,35 +1084,35 @@ def page_request_simulator():
                 val = st.number_input(f"{r_names[j]} (Avail: {available[j]})", min_value=0, max_value=total[j], value=int(init_val), key=f"req_in_{j}")
                 current_request.append(int(val))
 
-    sim_btn = st.button("Execute Banker's Request Procedure", type="primary", use_container_width=True)
+    sim_btn = st.button("Execute Banker's Request Procedure", type="primary", use_container_width=True, icon=":material/play_arrow:")
 
     if sim_btn:
         st.write("---")
         st.subheader("Banker's Algorithm 7-Step Evaluation Procedure")
 
         # Step 1: Process validation
-        st.markdown(f"**Step 1 — Process Validation:** Process `P{sel_p}` is within bounds [0..{num_p-1}]. ✅")
+        st.markdown(f"**Step 1 — Process Validation:** Process `P{sel_p}` is within bounds [0..{num_p-1}]. (Valid)")
 
         # Step 2: Need check
         exceeds_need = any(current_request[j] > need[sel_p][j] for j in range(num_r))
         if exceeds_need:
-            st.markdown(f"**Step 2 — Request vs Need Check:** ❌ **FAILED**. Request `{current_request}` exceeds process Need `{need[sel_p]}`.")
+            st.markdown(f"**Step 2 — Request vs Need Check:** FAILED. Request `{current_request}` exceeds process Need `{need[sel_p]}`.")
             render_status_badge("INVALID INPUT")
-            st.error("Error: Process has exceeded its declared maximum claim. Request is rejected as INVALID INPUT.")
+            st.error("Error: Process has exceeded its declared maximum claim. Request is rejected as INVALID INPUT.", icon=":material/cancel:")
             return
 
-        st.markdown(f"**Step 2 — Request vs Need Check:** Request `{current_request}` <= Need `{need[sel_p]}`. ✅ **PASSED**.")
+        st.markdown(f"**Step 2 — Request vs Need Check:** Request `{current_request}` <= Need `{need[sel_p]}`. (Passed)")
 
         # Step 3: Available check
         exceeds_avail = any(current_request[j] > available[j] for j in range(num_r))
         if exceeds_avail:
-            st.markdown(f"**Step 3 — Request vs Available Check:** ⏳ **UNAVAILABLE**. Request `{current_request}` exceeds Available `{available}`.")
+            st.markdown(f"**Step 3 — Request vs Available Check:** UNAVAILABLE. Request `{current_request}` exceeds Available `{available}`.")
             render_status_badge("REQUEST WAITING / NOT CURRENTLY AVAILABLE")
-            st.warning("Decision: Resources are not currently available. Process P" + str(sel_p) + " must wait. (Not an invalid request).")
-            st.info("System state remains completely unchanged.")
+            st.warning(f"Decision: Resources are not currently available. Process P{sel_p} must wait. (Not an invalid request).", icon=":material/hourglass_empty:")
+            st.info("System state remains completely unchanged.", icon=":material/info:")
             return
 
-        st.markdown(f"**Step 3 — Request vs Available Check:** Request `{current_request}` <= Available `{available}`. ✅ **PASSED**.")
+        st.markdown(f"**Step 3 — Request vs Available Check:** Request `{current_request}` <= Available `{available}`. (Passed)")
 
         # Step 4: Simulate tentative allocation
         st.markdown("**Step 4 — Tentative Allocation Simulation:** Temporarily modifying Work, Allocation, and Need copies.")
@@ -835,22 +1123,22 @@ def page_request_simulator():
 
         # Steps 6 & 7: Commit or Rollback
         if sim_res["status"] == "granted":
-            st.markdown("**Step 6 — Decision:** State is SAFE. Commit allocation. ✅")
+            st.markdown("**Step 6 — Decision:** State is SAFE. Commit allocation.")
             render_status_badge("REQUEST GRANTED")
-            st.success(f"Request granted! Safe sequence under tentative state: {sim_res['safe_sequence']}")
+            st.success(f"Request granted! Safe sequence under tentative state: {sim_res['safe_sequence']}", icon=":material/check_circle:")
 
-            # Commit Button to persist into session state
-            if st.button("Commit This Allocation to Session State", type="primary"):
+            # Commit Button to persist into session state (preserved as-is)
+            if st.button("Commit This Allocation to Session State", type="primary", icon=":material/save:"):
                 st.session_state.config["allocation"] = sim_res["after_allocation"]
-                st.success("Allocation permanently committed to active session!")
+                st.success("Allocation permanently committed to active session!", icon=":material/check_circle:")
                 st.rerun()
 
         elif sim_res["status"] == "denied":
-            st.markdown("**Step 7 — Decision:** State is UNSAFE. Revert tentative allocation and restore original state. ❌")
+            st.markdown("**Step 7 — Decision:** State is UNSAFE. Revert tentative allocation and restore original state.")
             render_status_badge("REQUEST DENIED")
-            st.error("Request rejected! Granting this request leads to an UNSAFE state with no guaranteed completion sequence.")
-            st.warning(f"Unsafe Reason: {sim_res.get('unsafe_reason', 'No safe sequence exists')}")
-            st.info("Rollback Verified: Original Allocation, Available, and Need matrices remain strictly unchanged.")
+            st.error("Request rejected! Granting this request leads to an UNSAFE state with no guaranteed completion sequence.", icon=":material/cancel:")
+            st.warning(f"Unsafe Reason: {sim_res.get('unsafe_reason', 'No safe sequence exists')}", icon=":material/warning:")
+            st.info("Rollback Verified: Original Allocation, Available, and Need matrices remain strictly unchanged.", icon=":material/info:")
 
         # Before and After Comparison
         st.write("---")
@@ -888,14 +1176,10 @@ def page_request_simulator():
 # 5. Deadlock Detection & Recovery
 # ---------------------------------------------------------
 def page_deadlock_detection():
-    st.markdown(
-        """
-        <div class="dashboard-header">
-            <h1>Deadlock Detection and Recovery</h1>
-            <p>Separate deadlock-detection model (Silberschatz et al.), Resource Allocation Graph (RAG) circular-wait visualization, and process termination recovery.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    render_page_header(
+        eyebrow="ALGORITHMS",
+        title="DEADLOCK DETECTION.",
+        description="Multi-instance deadlock detection (Silberschatz et al.), Resource Allocation Graph circular-wait visualization, and process termination recovery.",
     )
 
     t_circ, t_custom = st.tabs(["Circular-Wait RAG Scenario & Recovery", "Custom Multi-Resource Deadlock Detection"])
@@ -928,31 +1212,35 @@ def page_deadlock_detection():
 
         with col_d2:
             st.write("**Resource Allocation Graph (RAG):**")
-            # Interactive Graph Visualization using Plotly
             rag_fig = go.Figure()
-            # Nodes: P0, P1, R0, R1
             node_x = [0.2, 0.8, 0.2, 0.8]
             node_y = [0.8, 0.2, 0.2, 0.8]
             node_text = ["Process P0", "Process P1", "Resource R0 (Alloc to P0)", "Resource R1 (Alloc to P1)"]
-            node_color = ["#48cae4", "#48cae4", "#f39c12", "#f39c12"]
+            
+            # Process nodes = circle, Resource nodes = square (distinguishable by shape & label)
+            p_node_color = "#1A3A9E"
+            r_node_color = "#C77D0A"
+            node_color = [p_node_color, p_node_color, r_node_color, r_node_color]
+            node_symbols = ["circle", "circle", "square", "square"]
 
-            # Add nodes
             rag_fig.add_trace(go.Scatter(
                 x=node_x, y=node_y,
                 mode="markers+text",
                 text=["P0", "P1", "R0", "R1"],
                 textposition="middle center",
-                marker=dict(size=40, color=node_color, line=dict(color="#ffffff", width=2)),
+                textfont=dict(color="#FFFFFF", family="JetBrains Mono, monospace", size=13),
+                marker=dict(size=44, color=node_color, symbol=node_symbols, line=dict(color="#D5DAEB", width=2)),
                 hovertext=node_text,
                 hoverinfo="text",
             ))
 
-            # Add directed arrows for cycle: P0 -> R1, R1 -> P1, P1 -> R0, R0 -> P0
+            req_arrow = "#C77D0A"
+            alloc_arrow = "#1E8E5A"
             edges = [
-                (0.2, 0.8, 0.8, 0.8, "P0 requests R1 (Red)", "#e74c3c"),
-                (0.8, 0.8, 0.8, 0.2, "R1 allocated to P1 (Blue)", "#00b4d8"),
-                (0.8, 0.2, 0.2, 0.2, "P1 requests R0 (Red)", "#e74c3c"),
-                (0.2, 0.2, 0.2, 0.8, "R0 allocated to P0 (Blue)", "#00b4d8"),
+                (0.2, 0.8, 0.8, 0.8, "P0 requests R1", req_arrow),
+                (0.8, 0.8, 0.8, 0.2, "R1 allocated to P1", alloc_arrow),
+                (0.8, 0.2, 0.2, 0.2, "P1 requests R0", req_arrow),
+                (0.2, 0.2, 0.2, 0.8, "R0 allocated to P0", alloc_arrow),
             ]
             for x0, y0, x1, y1, desc, col in edges:
                 rag_fig.add_annotation(
@@ -965,44 +1253,44 @@ def page_deadlock_detection():
                     arrowcolor=col,
                 )
 
-            rag_fig.update_layout(
+            rag_layout = get_themed_plotly_layout()
+            rag_layout.update(
                 showlegend=False,
                 xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
                 yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                paper_bgcolor="#1b263b",
-                plot_bgcolor="#1b263b",
-                margin=dict(l=10, r=10, t=10, b=10),
                 height=300,
+                margin=dict(l=10, r=10, t=10, b=10),
             )
+            rag_fig.update_layout(**rag_layout)
             st.plotly_chart(rag_fig, use_container_width=True)
 
         st.write("### Detection Analysis Result")
         if det_before["deadlocked"]:
             render_status_badge("DEADLOCK DETECTED")
-            st.error(f"**Deadlock Confirmed:** Processes {[f'P{p}' for p in det_before['deadlocked_processes']]} are involved in circular wait.")
+            st.error(f"**Deadlock Confirmed:** Processes {[f'P{p}' for p in det_before['deadlocked_processes']]} are involved in circular wait.", icon=":material/cancel:")
         else:
             render_status_badge("SAFE")
-            st.success("No deadlock detected.")
+            st.success("No deadlock detected.", icon=":material/check_circle:")
 
         st.write("---")
         st.subheader("Deadlock Recovery Action (Process Termination)")
         rec_col1, rec_col2 = st.columns([1, 2])
         with rec_col1:
             term_p = st.selectbox("Select Process to Terminate for Recovery", [0, 1], format_func=lambda x: f"P{x}")
-            rec_btn = st.button("Terminate Process & Recover", type="primary")
+            rec_btn = st.button("Terminate Process & Recover", type="primary", icon=":material/delete_forever:")
 
         with rec_col2:
             if rec_btn:
                 rec_res = recover_and_detect(scenario["available"], scenario["allocation"], scenario["request"], term_p)
-                st.success(f"Process P{term_p} terminated. Released resources: {rec_res['released']}")
+                st.success(f"Process P{term_p} terminated. Released resources: {rec_res['released']}", icon=":material/check_circle:")
                 st.write(f"Updated Available: `{rec_res['available']}`")
 
                 if rec_res["deadlock_cleared"]:
                     render_status_badge("SAFE")
-                    st.success("Deadlock successfully cleared! The remaining process can proceed to completion.")
+                    st.success("Deadlock successfully cleared! The remaining process can proceed to completion.", icon=":material/check_circle:")
                 else:
                     render_status_badge("DEADLOCK DETECTED")
-                    st.error("Deadlock persists after recovery attempt.")
+                    st.error("Deadlock persists after recovery attempt.", icon=":material/cancel:")
 
     with t_custom:
         st.subheader("Custom Multi-Resource Deadlock Detection")
@@ -1027,14 +1315,14 @@ def page_deadlock_detection():
             cust_req = st.data_editor(pd.DataFrame([[1 if (i + 1) % c_r == j else 0 for j in range(c_r)] for i in range(c_p)], index=[f"P{i}" for i in range(c_p)], columns=r_labels), key="cd_req")
             c_req_mat = [[int(v) for v in row] for row in cust_req.values]
 
-        if st.button("Run Multi-Instance Deadlock Detection", type="primary"):
+        if st.button("Run Multi-Instance Deadlock Detection", type="primary", icon=":material/search:"):
             c_det = detect_deadlock(c_avail_list, c_alloc_mat, c_req_mat)
             if c_det["deadlocked"]:
                 render_status_badge("DEADLOCK DETECTED")
-                st.error(f"Deadlocked Processes: {[f'P{p}' for p in c_det['deadlocked_processes']]}")
+                st.error(f"Deadlocked Processes: {[f'P{p}' for p in c_det['deadlocked_processes']]}", icon=":material/cancel:")
             else:
                 render_status_badge("SAFE")
-                st.success("No deadlock detected. All processes can complete.")
+                st.success("No deadlock detected. All processes can complete.", icon=":material/check_circle:")
 
             if c_det["steps"]:
                 st.write("**Completion Trace:**")
@@ -1045,23 +1333,18 @@ def page_deadlock_detection():
 # 6. Deadlock Prevention and Recovery
 # ---------------------------------------------------------
 def page_prevention():
-    st.markdown(
-        """
-        <div class="dashboard-header">
-            <h1>Deadlock Prevention and Recovery Strategies</h1>
-            <p>Explore the 4 necessary Coffman conditions, hierarchical resource ordering, and hold-and-wait elimination policies.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    render_page_header(
+        eyebrow="ALGORITHMS",
+        title="DEADLOCK PREVENTION.",
+        description="Explore the 4 necessary Coffman conditions, hierarchical resource ordering, and hold-and-wait elimination policies.",
     )
 
-    # The 4 Coffman Conditions
     st.subheader("The Four Necessary Conditions for Deadlock (Coffman et al.)")
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown(
             """
-            <div class="concept-box" style="border-left-color: #e74c3c;">
+            <div class="concept-box" style="border-left-color: var(--status-deadlock);">
                 <b>1. Mutual Exclusion</b><br>
                 At least one resource must be held in a non-shareable mode. Only one process at a time can use the resource.
             </div>
@@ -1071,7 +1354,7 @@ def page_prevention():
     with c2:
         st.markdown(
             """
-            <div class="concept-box" style="border-left-color: #f39c12;">
+            <div class="concept-box" style="border-left-color: var(--status-unsafe);">
                 <b>2. Hold and Wait</b><br>
                 A process must be currently holding at least one resource and waiting to acquire additional resources held by others.
             </div>
@@ -1081,7 +1364,7 @@ def page_prevention():
     with c3:
         st.markdown(
             """
-            <div class="concept-box" style="border-left-color: #3498db;">
+            <div class="concept-box" style="border-left-color: var(--status-waiting);">
                 <b>3. No Preemption</b><br>
                 Resources cannot be preempted; a resource can be released only voluntarily by the process holding it after task completion.
             </div>
@@ -1091,7 +1374,7 @@ def page_prevention():
     with c4:
         st.markdown(
             """
-            <div class="concept-box" style="border-left-color: #9b59b6;">
+            <div class="concept-box" style="border-left-color: var(--accent);">
                 <b>4. Circular Wait</b><br>
                 A closed chain of processes exists such that each process holds at least one resource needed by the next process in the chain.
             </div>
@@ -1099,7 +1382,7 @@ def page_prevention():
             unsafe_allow_html=True,
         )
 
-    st.info("💡 **Core Operating Systems Principle:** Preventing deadlock requires invalidating **at least one** of these four necessary conditions through system design policy.")
+    st.info("**Core Operating Systems Principle:** Preventing deadlock requires invalidating **at least one** of these four necessary conditions through system design policy.", icon=":material/lightbulb:")
 
     st.write("---")
 
@@ -1118,7 +1401,7 @@ def page_prevention():
     with col_ord1:
         st.write(f"**Global Ordering Hierarchy:** `{' < '.join(order_sim['order'])}`")
         st.dataframe(pd.DataFrame([
-            {"Process": p, "Desired Acquisition Sequence": " ➔ ".join(seq), "Policy Compliant": "✅ YES" if order_sim["compliance"][p] else "❌ VIOLATION"}
+            {"Process": p, "Desired Acquisition Sequence": " → ".join(seq), "Policy Compliant": "YES" if order_sim["compliance"][p] else "VIOLATION"}
             for p, seq in order_sim["process_acquisitions"].items()
         ]), use_container_width=True)
 
@@ -1170,19 +1453,14 @@ def page_prevention():
 # 7. Test Cases and Analysis
 # ---------------------------------------------------------
 def page_test_cases():
-    st.markdown(
-        """
-        <div class="dashboard-header">
-            <h1>Test Cases & Analytical Results Table</h1>
-            <p>Verification of Required Analytical Test Cases (TC1 – TC6) and 10 Boundary Edge-Case Scenarios.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    render_page_header(
+        eyebrow="ANALYSIS",
+        title="TEST CASES & RESULTS.",
+        description="Verification of Required Analytical Test Cases (TC1 – TC6) and 10 Boundary Edge-Case Scenarios.",
     )
 
-    # Rerun button
-    if st.button("🔄 Rerun All Test Suites & Refresh Analytical Table", type="primary"):
-        st.success("Test suites executed dynamically with real assertions.")
+    if st.button("Rerun All Test Suites & Refresh Analytical Table", type="primary", icon=":material/refresh:"):
+        st.success("Test suites executed dynamically with real assertions.", icon=":material/check_circle:")
 
     st.subheader("1. Required Analytical Results Table (TC1 – TC6)")
     st.caption("Populated dynamically using real execution results from the algorithm modules. No hardcoded outcomes.")
@@ -1191,14 +1469,13 @@ def page_test_cases():
     analytical_df = pd.DataFrame(analytical_rows)
     st.dataframe(analytical_df, use_container_width=True)
 
-    # Pass rate summary
     passed_count = sum(1 for r in analytical_rows if r["Pass/Fail"] == "PASS")
     st.markdown(f"**Analytical Test Suite Pass Rate:** `{passed_count} / {len(analytical_rows)} Passed (100%)`")
 
     st.write("---")
 
     st.subheader("2. Automated Boundary and Invalid Input Test Suite (BT1 – BT10)")
-    st.caption("Covers all 10 edge cases required by Section 14: zero available, negative inputs, out-of-range IDs, demand limits, and unsafe states.")
+    st.caption("Covers all 10 edge cases: zero available, negative inputs, out-of-range IDs, demand limits, and unsafe states.")
 
     boundary_rows = run_boundary_tests()
     b_display = [
@@ -1208,7 +1485,7 @@ def page_test_cases():
             "Input Scenario": b["input"],
             "Expected Outcome": b["expected"],
             "Actual Result": b["actual"],
-            "Status": "PASS ✅" if b["pass"] else "FAIL ❌",
+            "Status": "PASS" if b["pass"] else "FAIL",
             "OS Engineering Explanation": b["explanation"],
         }
         for b in boundary_rows
@@ -1223,14 +1500,10 @@ def page_test_cases():
 # 8. AI Usage Record and Documentation
 # ---------------------------------------------------------
 def page_documentation():
-    st.markdown(
-        """
-        <div class="dashboard-header">
-            <h1>AI Usage Record & Educational Documentation</h1>
-            <p>Transparency record of AI assistance, OS concept glossary, 6-minute viva guide, and model viva Q&A.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    render_page_header(
+        eyebrow="DOCS",
+        title="AI USAGE & DOCS.",
+        description="Transparency record of AI assistance, OS concept glossary, 6-minute viva guide, and model viva Q&A.",
     )
 
     t_ai, t_gloss, t_viva, t_qa = st.tabs([
@@ -1252,7 +1525,7 @@ def page_documentation():
             {
                 "AI Tool Used": "GitHub Copilot / Claude / Gemini",
                 "Purpose": "Dashboard UI & Architecture",
-                "Output Generated": "Streamlit page structure, Plotly visualization templates, dark theme layout",
+                "Output Generated": "Streamlit page structure, Plotly visualization templates, warm theme layout",
                 "Student Verification": "Refactored layout into modular functions, customized color palette, and verified responsive rendering.",
             },
             {
@@ -1269,7 +1542,7 @@ def page_documentation():
             },
         ]
         st.dataframe(pd.DataFrame(ai_table), use_container_width=True)
-        st.info("Verified by student team members. No AI-generated code was deployed without independent review.")
+        st.info("Verified by student team members. No AI-generated code was deployed without independent review.", icon=":material/verified:")
 
     with t_gloss:
         st.subheader("Operating Systems Concept Glossary")
@@ -1340,27 +1613,82 @@ def page_documentation():
 
 
 # ---------------------------------------------------------
-# Main Router
+# Navigation Registration & Main Router
 # ---------------------------------------------------------
-def main():
-    page = render_sidebar()
+pages = {
+    "SETUP": [
+        st.Page(page_overview, title="Overview", icon=":material/dashboard:", default=True, url_path="overview"),
+        st.Page(page_configuration, title="Configuration", icon=":material/tune:", url_path="configuration"),
+    ],
+    "ALGORITHMS": [
+        st.Page(page_bankers, title="Banker's Algorithm", icon=":material/calculate:", url_path="bankers"),
+        st.Page(page_request_simulator, title="Request Simulator", icon=":material/send:", url_path="simulator"),
+        st.Page(page_deadlock_detection, title="Deadlock Detection", icon=":material/hub:", url_path="deadlock-detection"),
+        st.Page(page_prevention, title="Deadlock Prevention", icon=":material/shield:", url_path="prevention"),
+    ],
+    "ANALYSIS": [
+        st.Page(page_test_cases, title="Test Cases", icon=":material/fact_check:", url_path="test-cases"),
+    ],
+    "DOCS": [
+        st.Page(page_documentation, title="AI Usage Record", icon=":material/description:", url_path="documentation"),
+    ],
+}
 
-    if page == "1. Overview Dashboard":
-        page_overview()
-    elif page == "2. Resource Configuration":
-        page_configuration()
-    elif page == "3. Banker's Algorithm":
-        page_bankers()
-    elif page == "4. Resource Request Simulator":
-        page_request_simulator()
-    elif page == "5. Deadlock Detection":
-        page_deadlock_detection()
-    elif page == "6. Deadlock Prevention and Recovery":
-        page_prevention()
-    elif page == "7. Test Cases and Analysis":
-        page_test_cases()
-    elif page == "8. AI Usage Record and Documentation":
-        page_documentation()
+
+def render_sidebar():
+    """Render the editorial poster sidebar navigation."""
+    with st.sidebar:
+        st.markdown(
+            """
+            <div class="sidebar-header-box">
+                <div class="sidebar-app-title">OS DASHBOARD</div>
+                <span class="sidebar-subtitle">ACTIVITY 2 / DEADLOCK ANALYSIS</span>
+                <div class="sidebar-rule"></div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown('<div class="nav-section-title">SETUP</div>', unsafe_allow_html=True)
+        st.page_link(pages["SETUP"][0], label="Overview", icon=":material/dashboard:")
+        st.page_link(pages["SETUP"][1], label="Configuration", icon=":material/tune:")
+
+        st.markdown('<div class="nav-section-title">ALGORITHMS</div>', unsafe_allow_html=True)
+        st.page_link(pages["ALGORITHMS"][0], label="Banker's Algorithm", icon=":material/calculate:")
+        st.page_link(pages["ALGORITHMS"][1], label="Request Simulator", icon=":material/send:")
+        st.page_link(pages["ALGORITHMS"][2], label="Deadlock Detection", icon=":material/hub:")
+        st.page_link(pages["ALGORITHMS"][3], label="Deadlock Prevention", icon=":material/shield:")
+
+        st.markdown('<div class="nav-section-title">ANALYSIS</div>', unsafe_allow_html=True)
+        st.page_link(pages["ANALYSIS"][0], label="Test Cases", icon=":material/fact_check:")
+
+        st.markdown('<div class="nav-section-title">DOCS</div>', unsafe_allow_html=True)
+        st.page_link(pages["DOCS"][0], label="AI Usage Record", icon=":material/description:")
+
+        st.markdown(
+            """
+            <div class="sidebar-footer-box">
+                <b>System Model:</b> Banker's Algorithm & Multiple-Instance RAG.<br>
+                <b>Framework:</b> Streamlit.<br>
+                <b>Status:</b> All algorithms active & verified.
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+
+def main():
+    # Inject active theme CSS
+    st.markdown(get_custom_css(), unsafe_allow_html=True)
+
+    # Initialize grouped navigation router
+    nav = st.navigation(pages, position="hidden")
+
+    # Render sidebar navigation
+    render_sidebar()
+
+    # Run active page
+    nav.run()
 
 
 if __name__ == "__main__":
