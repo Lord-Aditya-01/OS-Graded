@@ -54,7 +54,7 @@ def get_custom_css() -> str:
     """Generate high-impact, bold editorial poster CSS with Cloud White & Ultramarine Blue palette."""
     return """
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Oswald:wght@500;600&display=swap');
 
     :root {
         /* Single Theme: Cloud White & Ultramarine Blue */
@@ -96,19 +96,24 @@ def get_custom_css() -> str:
         --status-invalid-bg: rgba(91, 103, 148, 0.10);
         --status-invalid-border: rgba(91, 103, 148, 0.25);
         
-        /* Typography */
-        --font-display: 'Anton', 'Archivo Narrow', Impact, sans-serif;
+        /* Typography - Lighter, Tall & Condensed Display Font */
+        --font-display: 'Bebas Neue', 'Oswald', Impact, sans-serif;
         --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         --font-mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
         
-        /* Typography Scale (Fluid clamp) */
-        --text-h1: clamp(2.25rem, 4.5vw, 4.5rem);
-        --text-h2: clamp(1.5rem, 2.5vw, 2.25rem);
-        --text-h3: clamp(1.15rem, 1.8vw, 1.5rem);
-        --text-metric: clamp(2.5rem, 4vw, 4rem);
-        --text-body-size: 1.0625rem;
-        --text-table-size: 0.9375rem;
-        --text-label-size: 0.75rem;
+        /* Typography Scale - Rebalanced Exact Scale */
+        --text-h1: clamp(48px, 6vw, 72px);
+        --text-h2: 34px;
+        --text-h3: 26px;
+        --text-body-size: 20px;
+        --text-table-size: 20px;
+        --text-table-header-size: 18px;
+        --text-label-size: 14px;
+        --text-sidebar-nav: 18px;
+        --text-sidebar-section: 13px;
+        --text-sidebar-title: 34px;
+        --text-btn: 16px;
+        --text-metric: 56px;
         
         /* Spacing Scale (8px) */
         --space-1: 4px;
@@ -118,6 +123,7 @@ def get_custom_css() -> str:
         --space-5: 20px;
         --space-6: 24px;
         --space-8: 32px;
+        --space-10: 40px;
         --space-12: 48px;
         
         --radius-sm: 6px;
@@ -134,23 +140,38 @@ def get_custom_css() -> str:
         line-height: 1.6;
     }
     
-    /* Typography Rules */
-    h1, h2, h3 {
+    /* Layout Density - Max Width & Content Balance */
+    .main .block-container {
+        max-width: 1400px !important;
+        padding-top: 2rem !important;
+        padding-bottom: 3.5rem !important;
+    }
+    
+    /* Typography Rules - Lighter, Clean Display Font with Positive Letter Spacing */
+    h1, h2, h3, .editorial-title, .sidebar-app-title {
         font-family: var(--font-display) !important;
+        font-weight: 400 !important;
+        font-synthesis: none !important;
+        -webkit-font-smoothing: antialiased;
         text-transform: uppercase !important;
-        letter-spacing: -0.015em !important;
-        line-height: 0.95 !important;
+        letter-spacing: 0.035em !important;
+        line-height: 1.05 !important;
         color: var(--text-primary) !important;
     }
     
-    h1 { font-size: var(--text-h1) !important; margin: 0 0 var(--space-3) 0 !important; }
-    h2 { font-size: var(--text-h2) !important; margin-top: var(--space-6) !important; margin-bottom: var(--space-3) !important; }
-    h3 { font-size: var(--text-h3) !important; margin-top: var(--space-4) !important; margin-bottom: var(--space-2) !important; }
+    h1 { font-size: var(--text-h1) !important; margin: 0 0 var(--space-4) 0 !important; }
+    h2 { font-size: var(--text-h2) !important; margin-top: var(--space-8) !important; margin-bottom: var(--space-4) !important; }
+    h3 { font-size: var(--text-h3) !important; margin-top: var(--space-6) !important; margin-bottom: var(--space-3) !important; }
     h4, h5, h6 {
         font-family: var(--font-body) !important;
-        font-weight: 700 !important;
+        font-weight: 600 !important;
         color: var(--text-primary) !important;
         letter-spacing: 0.02em !important;
+        font-size: 22px !important;
+    }
+    
+    p, span, label, li {
+        font-size: inherit;
     }
     
     code, pre, .stDataFrame, [data-testid="stTable"] {
@@ -159,16 +180,16 @@ def get_custom_css() -> str:
     
     /* Editorial Top Page Header */
     .editorial-header {
-        margin-bottom: var(--space-4);
+        margin-bottom: var(--space-6);
         padding-top: var(--space-1);
     }
     
     .editorial-eyebrow {
         font-family: var(--font-body);
         font-size: var(--text-label-size);
-        font-weight: 700;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.18em;
+        letter-spacing: 0.14em;
         color: var(--text-muted);
         margin-bottom: var(--space-2);
         display: block;
@@ -177,26 +198,28 @@ def get_custom_css() -> str:
     .editorial-title {
         font-family: var(--font-display) !important;
         font-size: var(--text-h1) !important;
+        font-weight: 400 !important;
+        font-synthesis: none !important;
         text-transform: uppercase !important;
-        line-height: 0.95 !important;
-        letter-spacing: -0.015em !important;
+        line-height: 1.05 !important;
+        letter-spacing: 0.035em !important;
         color: var(--text-primary) !important;
         margin: 0 0 var(--space-2) 0 !important;
     }
     
     .editorial-desc {
         font-family: var(--font-body);
-        font-size: 1.05rem;
+        font-size: var(--text-body-size);
         color: var(--text-muted);
         margin: 0 0 var(--space-4) 0;
-        line-height: 1.5;
+        line-height: 1.6;
     }
     
     .editorial-rule {
         height: 1px;
         background-color: var(--border);
         border: none;
-        margin-bottom: var(--space-6);
+        margin-bottom: var(--space-8);
     }
     
     /* Metric Cards */
@@ -204,7 +227,7 @@ def get_custom_css() -> str:
         background: var(--bg-surface);
         border: 1px solid var(--border);
         border-radius: var(--radius-lg);
-        padding: var(--space-5) var(--space-4);
+        padding: 24px 22px;
         text-align: left;
         transition: border-color 0.15s ease, transform 0.15s ease;
     }
@@ -216,26 +239,27 @@ def get_custom_css() -> str:
     .metric-title {
         font-family: var(--font-body);
         font-size: var(--text-label-size);
-        font-weight: 700;
+        font-weight: 600;
         text-transform: uppercase;
         color: var(--text-muted);
-        letter-spacing: 0.18em;
-        margin-bottom: var(--space-1);
+        letter-spacing: 0.14em;
+        margin-bottom: 6px;
     }
     
     .metric-value {
         font-family: var(--font-display);
         font-size: var(--text-metric);
         font-weight: 400;
-        line-height: 1.0;
+        font-synthesis: none !important;
+        line-height: 1.05;
         color: var(--text-primary);
-        letter-spacing: -0.02em;
-        margin-bottom: var(--space-1);
+        letter-spacing: 0.03em;
+        margin-bottom: 4px;
     }
     
     .metric-subtitle {
         font-family: var(--font-mono);
-        font-size: 0.8125rem;
+        font-size: 15px;
         color: var(--text-muted);
     }
     
@@ -244,19 +268,19 @@ def get_custom_css() -> str:
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 6px 14px;
+        padding: 7px 16px;
         border-radius: var(--radius-pill);
         font-family: var(--font-body);
-        font-weight: 700;
-        font-size: 0.8125rem;
-        letter-spacing: 0.06em;
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
         line-height: 1;
     }
     
     .status-badge svg {
-        width: 15px;
-        height: 15px;
+        width: 16px;
+        height: 16px;
         flex-shrink: 0;
     }
     
@@ -289,11 +313,11 @@ def get_custom_css() -> str:
         background-color: var(--bg-surface);
         border: 1px solid var(--border);
         border-left: 4px solid var(--accent);
-        padding: var(--space-4) var(--space-6);
+        padding: 24px 28px;
         border-radius: 0 var(--radius-md) var(--radius-md) 0;
-        margin: var(--space-4) 0;
+        margin: var(--space-6) 0;
         color: var(--text-body);
-        font-size: 0.9375rem;
+        font-size: var(--text-body-size);
         line-height: 1.6;
     }
     
@@ -304,11 +328,11 @@ def get_custom_css() -> str:
         border: 1px solid var(--accent) !important;
         border-radius: var(--radius-md) !important;
         font-family: var(--font-body) !important;
-        font-weight: 700 !important;
+        font-weight: 600 !important;
         text-transform: uppercase !important;
-        font-size: 0.8125rem !important;
+        font-size: var(--text-btn) !important;
         letter-spacing: 0.08em !important;
-        padding: 0.5rem 1.25rem !important;
+        padding: 0.65rem 1.4rem !important;
         transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.05s ease !important;
     }
     
@@ -330,9 +354,9 @@ def get_custom_css() -> str:
         font-family: var(--font-body) !important;
         font-weight: 600 !important;
         text-transform: uppercase !important;
-        font-size: 0.8125rem !important;
+        font-size: var(--text-btn) !important;
         letter-spacing: 0.06em !important;
-        padding: 0.5rem 1.25rem !important;
+        padding: 0.65rem 1.4rem !important;
     }
     
     .stButton > button[kind="secondary"]:hover, .stButton > button[data-testid="stBaseButton-secondary"]:hover {
@@ -357,22 +381,24 @@ def get_custom_css() -> str:
     
     .sidebar-app-title {
         font-family: var(--font-display) !important;
-        font-size: 1.85rem !important;
-        letter-spacing: -0.015em !important;
+        font-size: var(--text-sidebar-title) !important;
+        font-weight: 400 !important;
+        font-synthesis: none !important;
+        letter-spacing: 0.035em !important;
         color: var(--text-primary) !important;
         text-transform: uppercase !important;
-        line-height: 0.95 !important;
+        line-height: 1.05 !important;
         margin: 0 0 6px 0 !important;
     }
     
     .sidebar-subtitle {
         font-family: var(--font-body) !important;
-        font-size: 0.6875rem !important;
-        font-weight: 700 !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.18em !important;
+        letter-spacing: 0.14em !important;
         color: var(--text-muted) !important;
-        line-height: 1.2 !important;
+        line-height: 1.3 !important;
         display: block;
     }
     
@@ -388,7 +414,7 @@ def get_custom_css() -> str:
         padding: 1rem 0.5rem 0.5rem 0.5rem;
         border-top: 1px solid var(--border);
         font-family: var(--font-body);
-        font-size: 0.75rem;
+        font-size: 14px;
         color: var(--text-muted);
         line-height: 1.5;
     }
@@ -396,12 +422,12 @@ def get_custom_css() -> str:
     /* Sidebar Navigation Section Headings */
     .nav-section-title {
         font-family: var(--font-body) !important;
-        font-size: var(--text-label-size) !important;
-        font-weight: 700 !important;
+        font-size: var(--text-sidebar-section) !important;
+        font-weight: 600 !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.18em !important;
+        letter-spacing: 0.14em !important;
         color: var(--text-muted) !important;
-        padding: 0.85rem 0.5rem 0.25rem 0.5rem !important;
+        padding: 1rem 0.5rem 0.25rem 0.5rem !important;
     }
     
     .nav-section-title:first-of-type {
@@ -413,13 +439,13 @@ def get_custom_css() -> str:
     [data-testid="stPageLink"] a {
         display: flex !important;
         align-items: center !important;
-        gap: 10px !important;
+        gap: 12px !important;
         border-radius: var(--radius-md) !important;
-        padding: 0.45rem 0.75rem !important;
-        margin: 2px 0 !important;
+        padding: 0.55rem 0.85rem !important;
+        margin: 3px 0 !important;
         color: var(--text-body) !important;
         font-family: var(--font-body) !important;
-        font-size: 0.875rem !important;
+        font-size: var(--text-sidebar-nav) !important;
         font-weight: 500 !important;
         text-decoration: none !important;
         background-color: transparent !important;
@@ -466,6 +492,8 @@ def get_custom_css() -> str:
         background-color: var(--bg-surface) !important;
         font-family: var(--font-mono) !important;
         font-size: var(--text-table-size) !important;
+        color: var(--text-body) !important;
+        font-feature-settings: 'tnum' 1 !important;
     }
     
     /* Tabs */
@@ -477,11 +505,11 @@ def get_custom_css() -> str:
     .stTabs [data-baseweb="tab"] {
         font-family: var(--font-body) !important;
         font-weight: 600 !important;
-        font-size: 0.8125rem !important;
+        font-size: 16px !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.06em !important;
+        letter-spacing: 0.08em !important;
         color: var(--text-muted) !important;
-        padding: 0.5rem 1rem !important;
+        padding: 0.65rem 1.25rem !important;
         border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important;
     }
     
@@ -494,11 +522,29 @@ def get_custom_css() -> str:
     [data-testid="stAlert"] {
         border-radius: var(--radius-md) !important;
         font-family: var(--font-body) !important;
-        font-size: 0.9375rem !important;
+        font-size: 17px !important;
+        line-height: 1.5 !important;
+    }
+    
+    /* Expander summaries */
+    [data-testid="stExpander"] summary {
+        font-family: var(--font-body) !important;
+        font-size: 18px !important;
+        font-weight: 600 !important;
+        color: var(--text-body) !important;
+    }
+    
+    /* Form widget labels */
+    [data-testid="stWidgetLabel"] p, label[data-baseweb="checkbox"] span {
+        font-family: var(--font-body) !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: var(--text-body) !important;
     }
     
     hr {
         border-color: var(--border) !important;
+        margin: var(--space-8) 0 !important;
     }
 </style>
 """
@@ -514,18 +560,18 @@ def get_themed_plotly_layout() -> dict:
     return dict(
         paper_bgcolor=bg_surface,
         plot_bgcolor=bg_surface,
-        font=dict(family="Inter, sans-serif", color=text_secondary, size=12),
-        title_font=dict(family="Anton, Impact, sans-serif", color=text_primary, size=18),
+        font=dict(family="Inter, sans-serif", color=text_secondary, size=14),
+        title_font=dict(family="Bebas Neue, sans-serif", color=text_primary, size=24),
         colorway=["#1A3A9E", "#2D50B8", "#1E8E5A", "#C77D0A", "#C23B3B", "#5B6794"],
         xaxis=dict(
             gridcolor=grid_color,
             zerolinecolor=grid_color,
-            tickfont=dict(family="JetBrains Mono, monospace", color=text_secondary, size=11),
+            tickfont=dict(family="JetBrains Mono, monospace", color=text_secondary, size=14),
         ),
         yaxis=dict(
             gridcolor=grid_color,
             zerolinecolor=grid_color,
-            tickfont=dict(family="JetBrains Mono, monospace", color=text_secondary, size=11),
+            tickfont=dict(family="JetBrains Mono, monospace", color=text_secondary, size=14),
         ),
         legend=dict(
             orientation="h",
@@ -533,7 +579,7 @@ def get_themed_plotly_layout() -> dict:
             y=1.02,
             xanchor="right",
             x=1,
-            font=dict(family="Inter, sans-serif", color=text_secondary, size=11),
+            font=dict(family="Inter, sans-serif", color=text_secondary, size=14),
         ),
         margin=dict(l=24, r=24, t=44, b=24),
     )
@@ -777,11 +823,11 @@ def page_overview():
     st.subheader("Current Matrices Summary")
     t1, t2, t3 = st.tabs(["Allocation Matrix", "Maximum Matrix", "Need Matrix (Max - Alloc)"])
     with t1:
-        st.dataframe(pd.DataFrame(alloc, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True)
+        st.dataframe(pd.DataFrame(alloc, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True, row_height=42)
     with t2:
-        st.dataframe(pd.DataFrame(maximum, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True)
+        st.dataframe(pd.DataFrame(maximum, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True, row_height=42)
     with t3:
-        st.dataframe(pd.DataFrame(need, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True)
+        st.dataframe(pd.DataFrame(need, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True, row_height=42)
 
 
 # ---------------------------------------------------------
@@ -854,7 +900,7 @@ def page_configuration():
     while len(cur_totals) < r_count:
         cur_totals.append(5)
     total_df = pd.DataFrame([cur_totals], columns=r_names, index=["Total Instances"])
-    edited_totals = st.data_editor(total_df, use_container_width=True)
+    edited_totals = st.data_editor(total_df, use_container_width=True, row_height=42)
 
     col_mat1, col_mat2 = st.columns(2)
     with col_mat1:
@@ -866,7 +912,7 @@ def page_configuration():
                 row.append(0)
             cur_alloc.append(row)
         alloc_df = pd.DataFrame(cur_alloc, index=[f"P{i}" for i in range(p_count)], columns=r_names)
-        edited_alloc = st.data_editor(alloc_df, use_container_width=True)
+        edited_alloc = st.data_editor(alloc_df, use_container_width=True, row_height=42)
 
     with col_mat2:
         st.write("##### Maximum Demand Matrix")
@@ -877,7 +923,7 @@ def page_configuration():
                 row.append(0)
             cur_max.append(row)
         max_df = pd.DataFrame(cur_max, index=[f"P{i}" for i in range(p_count)], columns=r_names)
-        edited_max = st.data_editor(max_df, use_container_width=True)
+        edited_max = st.data_editor(max_df, use_container_width=True, row_height=42)
 
     st.write("---")
 
@@ -931,15 +977,15 @@ def page_bankers():
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("Allocation Matrix")
-        st.dataframe(pd.DataFrame(alloc, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True)
+        st.dataframe(pd.DataFrame(alloc, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True, row_height=42)
         st.subheader("Available Resource Vector")
-        st.dataframe(pd.DataFrame([available], index=["Available"], columns=r_names), use_container_width=True)
+        st.dataframe(pd.DataFrame([available], index=["Available"], columns=r_names), use_container_width=True, row_height=42)
 
     with col2:
         st.subheader("Maximum Demand Matrix")
-        st.dataframe(pd.DataFrame(maximum, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True)
+        st.dataframe(pd.DataFrame(maximum, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True, row_height=42)
         st.subheader("Need Matrix [Need = Max - Alloc]")
-        st.dataframe(pd.DataFrame(need, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True)
+        st.dataframe(pd.DataFrame(need, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True, row_height=42)
 
     st.write("---")
 
@@ -1010,7 +1056,7 @@ def page_bankers():
                 }
                 for s in safety["steps"]
             ]
-            st.dataframe(pd.DataFrame(trace_table), use_container_width=True)
+            st.dataframe(pd.DataFrame(trace_table), use_container_width=True, row_height=42)
 
 
 # ---------------------------------------------------------
@@ -1147,10 +1193,10 @@ def page_request_simulator():
         with comp1:
             st.write("**Allocation Matrix:**")
             if sim_res["status"] == "granted":
-                st.dataframe(pd.DataFrame(sim_res["after_allocation"], index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True)
+                st.dataframe(pd.DataFrame(sim_res["after_allocation"], index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True, row_height=42)
                 st.caption("Updated with granted request")
             else:
-                st.dataframe(pd.DataFrame(alloc, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True)
+                st.dataframe(pd.DataFrame(alloc, index=[f"P{i}" for i in range(num_p)], columns=r_names), use_container_width=True, row_height=42)
                 st.caption("Original allocation preserved")
 
         with comp2:
@@ -1205,9 +1251,9 @@ def page_deadlock_detection():
         col_d1, col_d2 = st.columns(2)
         with col_d1:
             st.write("**Allocation Matrix:**")
-            st.dataframe(pd.DataFrame(scenario["allocation"], index=["P0", "P1"], columns=["R0", "R1"]), use_container_width=True)
+            st.dataframe(pd.DataFrame(scenario["allocation"], index=["P0", "P1"], columns=["R0", "R1"]), use_container_width=True, row_height=42)
             st.write("**Request Matrix (Outstanding Requests):**")
-            st.dataframe(pd.DataFrame(scenario["request"], index=["P0", "P1"], columns=["R0", "R1"]), use_container_width=True)
+            st.dataframe(pd.DataFrame(scenario["request"], index=["P0", "P1"], columns=["R0", "R1"]), use_container_width=True, row_height=42)
             st.write(f"**Available Vector:** `{scenario['available']}`")
 
         with col_d2:
@@ -1301,18 +1347,18 @@ def page_deadlock_detection():
         r_labels = [f"R{j}" for j in range(c_r)]
 
         st.write("**Available Vector:**")
-        cust_avail = st.data_editor(pd.DataFrame([[0] * c_r], columns=r_labels, index=["Available"]), key="cd_avail")
+        cust_avail = st.data_editor(pd.DataFrame([[0] * c_r], columns=r_labels, index=["Available"]), key="cd_avail", row_height=42)
         c_avail_list = [int(v) for v in cust_avail.values[0]]
 
         c_col1, c_col2 = st.columns(2)
         with c_col1:
             st.write("**Allocation Matrix:**")
-            cust_alloc = st.data_editor(pd.DataFrame([[1 if i == j else 0 for j in range(c_r)] for i in range(c_p)], index=[f"P{i}" for i in range(c_p)], columns=r_labels), key="cd_alloc")
+            cust_alloc = st.data_editor(pd.DataFrame([[1 if i == j else 0 for j in range(c_r)] for i in range(c_p)], index=[f"P{i}" for i in range(c_p)], columns=r_labels), key="cd_alloc", row_height=42)
             c_alloc_mat = [[int(v) for v in row] for row in cust_alloc.values]
 
         with c_col2:
             st.write("**Request Matrix:**")
-            cust_req = st.data_editor(pd.DataFrame([[1 if (i + 1) % c_r == j else 0 for j in range(c_r)] for i in range(c_p)], index=[f"P{i}" for i in range(c_p)], columns=r_labels), key="cd_req")
+            cust_req = st.data_editor(pd.DataFrame([[1 if (i + 1) % c_r == j else 0 for j in range(c_r)] for i in range(c_p)], index=[f"P{i}" for i in range(c_p)], columns=r_labels), key="cd_req", row_height=42)
             c_req_mat = [[int(v) for v in row] for row in cust_req.values]
 
         if st.button("Run Multi-Instance Deadlock Detection", type="primary", icon=":material/search:"):
@@ -1326,7 +1372,7 @@ def page_deadlock_detection():
 
             if c_det["steps"]:
                 st.write("**Completion Trace:**")
-                st.dataframe(pd.DataFrame(c_det["steps"]), use_container_width=True)
+                st.dataframe(pd.DataFrame(c_det["steps"]), use_container_width=True, row_height=42)
 
 
 # ---------------------------------------------------------
@@ -1403,7 +1449,7 @@ def page_prevention():
         st.dataframe(pd.DataFrame([
             {"Process": p, "Desired Acquisition Sequence": " → ".join(seq), "Policy Compliant": "YES" if order_sim["compliance"][p] else "VIOLATION"}
             for p, seq in order_sim["process_acquisitions"].items()
-        ]), use_container_width=True)
+        ]), use_container_width=True, row_height=42)
 
     with col_ord2:
         st.write("**Policy Enforcement Outcome:**")
@@ -1446,7 +1492,7 @@ def page_prevention():
         {"Strategy": "Deadlock Detection", "Approach": "Post-Mortem Inspection", "When Applied": "Periodically at runtime", "Overhead": "Low-to-moderate", "Resource Starvation Risk": "None", "Primary Mechanism": "Identifies existing circular wait"},
         {"Strategy": "Deadlock Recovery", "Approach": "Corrective Action", "When Applied": "After detection", "Overhead": "High (Preemption or abort cost)", "Resource Starvation Risk": "Possible", "Primary Mechanism": "Process termination or resource preemption"},
     ]
-    st.dataframe(pd.DataFrame(comp_data), use_container_width=True)
+    st.dataframe(pd.DataFrame(comp_data), use_container_width=True, row_height=42)
 
 
 # ---------------------------------------------------------
@@ -1467,7 +1513,7 @@ def page_test_cases():
 
     analytical_rows = run_analytical_test_cases()
     analytical_df = pd.DataFrame(analytical_rows)
-    st.dataframe(analytical_df, use_container_width=True)
+    st.dataframe(analytical_df, use_container_width=True, row_height=42)
 
     passed_count = sum(1 for r in analytical_rows if r["Pass/Fail"] == "PASS")
     st.markdown(f"**Analytical Test Suite Pass Rate:** `{passed_count} / {len(analytical_rows)} Passed (100%)`")
@@ -1490,7 +1536,7 @@ def page_test_cases():
         }
         for b in boundary_rows
     ]
-    st.dataframe(pd.DataFrame(b_display), use_container_width=True)
+    st.dataframe(pd.DataFrame(b_display), use_container_width=True, row_height=42)
 
     b_passed = sum(1 for b in boundary_rows if b["pass"])
     st.markdown(f"**Boundary Test Suite Pass Rate:** `{b_passed} / {len(boundary_rows)} Passed (100%)`")
@@ -1541,7 +1587,7 @@ def page_documentation():
                 "Student Verification": "Executed test suite with pytest (30/30 passing), added edge cases for zero available resources and capacity bounds.",
             },
         ]
-        st.dataframe(pd.DataFrame(ai_table), use_container_width=True)
+        st.dataframe(pd.DataFrame(ai_table), use_container_width=True, row_height=42)
         st.info("Verified by student team members. No AI-generated code was deployed without independent review.", icon=":material/verified:")
 
     with t_gloss:

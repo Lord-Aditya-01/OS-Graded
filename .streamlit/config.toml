@@ -8,3 +8,7 @@ backgroundColor = "#F6F6F3"
 secondaryBackgroundColor = "#FFFFFF"
 textColor = "#0F1B44"
 font = "sans serif"
+baseFontSize = 18
+dataframeHeaderBackgroundColor = "#E8ECF8"
+dataframeHeaderTextColor = "#1A3A9E"
+dataframeBorderColor = "#D5DAEB"
